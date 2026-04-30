@@ -35,7 +35,7 @@ body {
 .logo {
   max-width: 120px;
   object-fit: contain;
-  filter: drop-shadow(0 4px 20px rgba(180, 100, 255, 0.4));
+  filter: drop-shadow(0 4px 20px rgba(120, 100, 255, 0.4));
 }
 
 /* ===== Controles ===== */
