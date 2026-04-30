@@ -5,105 +5,114 @@ let tempoRestante = 0;
 let tempoTotal = 0;
 let intervalo;
 
-function format(t){
-  let m = Math.floor(t/60);
-  let s = t%60;
-  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+// SOM
+const somExplosao = new Audio('som.mp3');
+
+// ===== TEMPO =====
+function formatTime(t) {
+  let m = Math.floor(t / 60);
+  let s = t % 60;
+  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
 }
 
-function atualizar(){
-  document.getElementById('display').innerText = format(tempoRestante);
+function atualizarDisplay() {
+  document.getElementById('display').textContent = formatTime(tempoRestante);
 }
 
-function iniciar(){
-  let min = parseInt(document.getElementById('minutos').value)||0;
-  let seg = parseInt(document.getElementById('segundos').value)||0;
+// ===== CONTROLES =====
+function iniciar() {
+  let min = parseInt(document.getElementById('minutos').value) || 0;
+  let seg = parseInt(document.getElementById('segundos').value) || 0;
 
-  if(seg>=60){
-    min+=Math.floor(seg/60);
-    seg=seg%60;
+  if (seg >= 60) {
+    min += Math.floor(seg / 60);
+    seg = seg % 60;
   }
 
-  tempoTotal = min*60+seg;
+  tempoTotal = min * 60 + seg;
   tempoRestante = tempoTotal;
 
   rodar();
 }
 
-function setTempo(s){
-  tempoTotal = s;
-  tempoRestante = s;
+function setTempo(segundos) {
+  tempoTotal = segundos;
+  tempoRestante = segundos;
+
+  document.getElementById('minutos').value = Math.floor(segundos / 60);
+  document.getElementById('segundos').value = segundos % 60;
+
   rodar();
 }
 
-function rodar(){
+function rodar() {
   clearInterval(intervalo);
-  atualizar();
+  atualizarDisplay();
 
-  intervalo = setInterval(()=>{
+  document.getElementById('penalidade').classList.remove('visivel');
+
+  intervalo = setInterval(() => {
     tempoRestante--;
-    atualizar();
+    atualizarDisplay();
 
-    if(tempoRestante<=0){
+    if (tempoRestante <= 0) {
       clearInterval(intervalo);
-      tempoRestante=0;
-      atualizar();
+      tempoRestante = 0;
+      atualizarDisplay();
+
+      document.getElementById('penalidade').classList.add('visivel');
 
       explosao();
-      som.play();
-      document.getElementById('penalidade').style.display='block';
+      somExplosao.currentTime = 0;
+      somExplosao.play().catch(()=>{});
     }
-
-  },1000);
+  }, 1000);
 }
 
-function pausar(){
+function pausar() {
   clearInterval(intervalo);
 }
 
-function resetar(){
+function resetar() {
   clearInterval(intervalo);
-  tempoRestante=0;
-  atualizar();
-  document.getElementById('penalidade').style.display='none';
+  tempoRestante = 0;
+  tempoTotal = 0;
+  atualizarDisplay();
+  document.getElementById('penalidade').classList.remove('visivel');
 }
 
-/* explosão */
-function explosao(){
-  const c = document.getElementById('explosao');
+// ===== EXPLOSÃO =====
+function explosao() {
+  const container = document.getElementById('explosao');
 
-  for(let i=0;i<30;i++){
-    let p = document.createElement('div');
-    p.className='particula-explosao';
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'particula-explosao';
 
-    p.style.setProperty('--x',(Math.random()*300-150)+'px');
-    p.style.setProperty('--y',(Math.random()*300-150)+'px');
+    p.style.setProperty('--x', (Math.random() - 0.5) * 400 + 'px');
+    p.style.setProperty('--y', (Math.random() - 0.5) * 400 + 'px');
 
-    c.appendChild(p);
-
-    setTimeout(()=>p.remove(),700);
+    container.appendChild(p);
+    setTimeout(() => p.remove(), 700);
   }
 }
 
-/* som */
-const som = new Audio('som.mp3');
+// ===== AMPULHETA SIMPLES MAS FUNCIONAL =====
+function draw() {
+  ctx.clearRect(0, 0, 220, 340);
 
-/* ampulheta simples */
-function draw(){
-  ctx.clearRect(0,0,220,340);
+  let pct = tempoTotal ? tempoRestante / tempoTotal : 1;
 
-  let pct = tempoTotal ? tempoRestante/tempoTotal : 1;
-
-  ctx.fillStyle="gold";
-  ctx.fillRect(80,50,60,100*pct);
-  ctx.fillRect(80,200,60,100*(1-pct));
+  ctx.fillStyle = 'gold';
+  ctx.fillRect(80, 40, 60, 120 * pct);
+  ctx.fillRect(80, 180, 60, 120 * (1 - pct));
 
   requestAnimationFrame(draw);
 }
 
 draw();
 
-/* deixa global */
+// ===== GLOBAL =====
 window.setTempo = setTempo;
 window.iniciar = iniciar;
 window.pausar = pausar;
