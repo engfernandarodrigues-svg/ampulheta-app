@@ -1,55 +1,41 @@
 const canvas = document.getElementById('hg');
 const ctx = canvas.getContext('2d');
 
+let intervalo = null;
 let tempoRestante = 0;
 let tempoTotal = 0;
-let intervalo;
 
-// SOM
-const somExplosao = new Audio('som.mp3');
+function formatTime(totalSeg) {
+  const m = Math.floor(totalSeg / 60);
+  const s = totalSeg % 60;
+  return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
 
-// ===== TEMPO =====
-function formatTime(t) {
-  let m = Math.floor(t / 60);
-  let s = t % 60;
-  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+function getInputSeconds() {
+  const min = parseInt(document.getElementById('minutos').value) || 0;
+  const seg = parseInt(document.getElementById('segundos').value) || 0;
+  return min * 60 + seg;
 }
 
 function atualizarDisplay() {
   document.getElementById('display').textContent = formatTime(tempoRestante);
 }
 
-// ===== CONTROLES =====
 function iniciar() {
-  let min = parseInt(document.getElementById('minutos').value) || 0;
-  let seg = parseInt(document.getElementById('segundos').value) || 0;
+  clearInterval(intervalo);
 
-  if (seg >= 60) {
-    min += Math.floor(seg / 60);
-    seg = seg % 60;
+  const total = getInputSeconds();
+  if (total <= 0) {
+    alert('Digite um tempo válido');
+    return;
   }
 
-  tempoTotal = min * 60 + seg;
-  tempoRestante = tempoTotal;
-
-  rodar();
-}
-
-function setTempo(segundos) {
-  tempoTotal = segundos;
-  tempoRestante = segundos;
-
-  document.getElementById('minutos').value = Math.floor(segundos / 60);
-  document.getElementById('segundos').value = segundos % 60;
-
-  rodar();
-}
-
-function rodar() {
-  clearInterval(intervalo);
-  atualizarDisplay();
+  tempoTotal = total;
+  tempoRestante = total;
 
   document.getElementById('penalidade').classList.remove('visivel');
+
+  atualizarDisplay();
 
   intervalo = setInterval(() => {
     tempoRestante--;
@@ -57,14 +43,7 @@ function rodar() {
 
     if (tempoRestante <= 0) {
       clearInterval(intervalo);
-      tempoRestante = 0;
-      atualizarDisplay();
-
       document.getElementById('penalidade').classList.add('visivel');
-
-      explosao();
-      somExplosao.currentTime = 0;
-      somExplosao.play().catch(()=>{});
     }
   }, 1000);
 }
@@ -77,43 +56,24 @@ function resetar() {
   clearInterval(intervalo);
   tempoRestante = 0;
   tempoTotal = 0;
+
   atualizarDisplay();
+
   document.getElementById('penalidade').classList.remove('visivel');
 }
 
-// ===== EXPLOSÃO =====
-function explosao() {
-  const container = document.getElementById('explosao');
-
-  for (let i = 0; i < 40; i++) {
-    const p = document.createElement('div');
-    p.className = 'particula-explosao';
-
-    p.style.setProperty('--x', (Math.random() - 0.5) * 400 + 'px');
-    p.style.setProperty('--y', (Math.random() - 0.5) * 400 + 'px');
-
-    container.appendChild(p);
-    setTimeout(() => p.remove(), 700);
-  }
-}
-
-// ===== AMPULHETA SIMPLES MAS FUNCIONAL =====
+/* animação simples da ampulheta */
 function draw() {
   ctx.clearRect(0, 0, 220, 340);
 
-  let pct = tempoTotal ? tempoRestante / tempoTotal : 1;
+  ctx.fillStyle = "#e8c96a";
 
-  ctx.fillStyle = 'gold';
-  ctx.fillRect(80, 40, 60, 120 * pct);
-  ctx.fillRect(80, 180, 60, 120 * (1 - pct));
+  const pct = tempoTotal > 0 ? tempoRestante / tempoTotal : 1;
+
+  ctx.fillRect(90, 50, 40, 100 * pct); // topo
+  ctx.fillRect(90, 190, 40, 100 * (1 - pct)); // base
 
   requestAnimationFrame(draw);
 }
 
 draw();
-
-// ===== GLOBAL =====
-window.setTempo = setTempo;
-window.iniciar = iniciar;
-window.pausar = pausar;
-window.resetar = resetar;
