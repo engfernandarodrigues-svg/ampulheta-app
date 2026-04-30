@@ -1,0 +1,59 @@
+body {
+  font-family: Arial;
+  text-align: center;
+  background: #0f172a;
+  color: white;
+}
+
+.container {
+  margin-top: 50px;
+}
+
+input {
+  padding: 10px;
+  font-size: 16px;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+#display {
+  font-size: 60px;
+  margin: 20px;
+}
+
+.ampulheta {
+  position: relative;
+  width: 100px;
+  height: 200px;
+  margin: 30px auto;
+  border: 3px solid white;
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.areia {
+  position: absolute;
+  width: 100%;
+  background: gold;
+  transition: height 1s linear;
+}
+
+.cima {
+  top: 0;
+  height: 100%;
+}
+
+.baixo {
+  bottom: 0;
+  height: 0%;
+}

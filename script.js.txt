@@ -1,0 +1,50 @@
+let intervalo;
+let tempoRestante = 0;
+let tempoTotal = 0;
+
+function iniciar() {
+  clearInterval(intervalo);
+
+  tempoTotal = parseInt(document.getElementById("tempo").value);
+
+  if (!tempoTotal || tempoTotal <= 0) {
+    alert("Digite um tempo válido");
+    return;
+  }
+
+  tempoRestante = tempoTotal;
+  atualizarTela();
+
+  intervalo = setInterval(() => {
+    tempoRestante--;
+
+    atualizarTela();
+
+    if (tempoRestante <= 0) {
+      clearInterval(intervalo);
+      alert("⏳ Tempo acabou!");
+    }
+  }, 1000);
+}
+
+function pausar() {
+  clearInterval(intervalo);
+}
+
+function resetar() {
+  clearInterval(intervalo);
+  tempoRestante = 0;
+  tempoTotal = 0;
+  atualizarTela();
+}
+
+function atualizarTela() {
+  document.getElementById("display").innerText = tempoRestante;
+
+  if (tempoTotal > 0) {
+    let percentual = tempoRestante / tempoTotal;
+
+    document.getElementById("areiaCima").style.height = (percentual * 100) + "%";
+    document.getElementById("areiaBaixo").style.height = ((1 - percentual) * 100) + "%";
+  }
+}
