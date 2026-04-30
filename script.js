@@ -1,7 +1,5 @@
 // ============================================================
-//  AMPULHETA REALISTA — script.js
-//  Entrada: minutos + segundos
-//  Animação: Canvas 2D com partículas de areia e vidro SVG-like
+//  AMPULHETA PRO — script.js (VERSÃO ATUALIZADA)
 // ============================================================
 
 const canvas = document.getElementById('hg');
@@ -18,33 +16,35 @@ let particles      = [];
 let animFrame      = null;
 let lastSpawnTime  = 0;
 
-// ---- Geometria da ampulheta ----
-const NECK_X   = W / 2;
-const NECK_Y   = H / 2;
-const TOP_Y    = 32;
-const BOT_Y    = H - 32;
-const TOP_W    = 80;
-const BOT_W    = 80;
-const NECK_W   = 7;
-const GLASS_T  = 6; // espessura do vidro
+// ---- Geometria ----
+const NECK_X = W / 2;
+const NECK_Y = H / 2;
+const TOP_Y  = 32;
+const BOT_Y  = H - 32;
+const TOP_W  = 80;
+const BOT_W  = 80;
+const NECK_W = 7;
+const GLASS_T = 6;
 
 // ============================================================
-//  GEOMETRIA — pontos da silhueta
+//  UTIL
 // ============================================================
 function lerp(a, b, t) { return a + (b - a) * t; }
 
-/** Gera array de pontos [{x,y}] para um lado da ampulheta */
+// ============================================================
+//  GEOMETRIA
+// ============================================================
 function buildSide(side, steps = 50) {
   const pts = [];
   for (let i = 0; i <= steps; i++) {
-    const t  = i / steps;
-    const y  = lerp(TOP_Y, NECK_Y, t);
+    const t = i / steps;
+    const y = lerp(TOP_Y, NECK_Y, t);
     const hw = lerp(TOP_W / 2, NECK_W / 2, t * t);
     pts.push({ x: NECK_X + side * hw, y });
   }
   for (let i = 0; i <= steps; i++) {
-    const t  = i / steps;
-    const y  = lerp(NECK_Y, BOT_Y, t);
+    const t = i / steps;
+    const y = lerp(NECK_Y, BOT_Y, t);
     const hw = lerp(NECK_W / 2, BOT_W / 2, t * (2 - t));
     pts.push({ x: NECK_X + side * hw, y });
   }
@@ -54,7 +54,6 @@ function buildSide(side, steps = 50) {
 const outerLeft  = buildSide(-1);
 const outerRight = buildSide(1);
 
-/** Path2D da silhueta externa completa */
 function makeGlassPath() {
   const p = new Path2D();
   p.moveTo(outerLeft[0].x, outerLeft[0].y);
@@ -64,7 +63,6 @@ function makeGlassPath() {
   return p;
 }
 
-/** Path2D do interior (área de areia) — vidro com espessura */
 function makeInnerPath() {
   const p = new Path2D();
   const inL = outerLeft.map(pt => ({ x: pt.x + GLASS_T, y: pt.y }));
@@ -77,262 +75,175 @@ function makeInnerPath() {
 }
 
 // ============================================================
-//  CAMINHOS DE AREIA
+//  AREIA
 // ============================================================
-
-/** Areia no topo — pct=0 vazio, pct=1 cheio */
 function makeTopSandPath(pct) {
   if (pct <= 0) return null;
   const steps = 50;
   const pts = [];
+
   for (let i = 0; i <= steps; i++) {
-    const t  = i / steps;
-    const y  = lerp(NECK_Y, TOP_Y, t);
+    const t = i / steps;
+    const y = lerp(NECK_Y, TOP_Y, t);
     const hw = lerp(NECK_W / 2, TOP_W / 2, t * t) - GLASS_T;
-    pts.push({ x: NECK_X - hw, y, hw });
+    pts.push({ x: NECK_X - hw, y });
   }
+
   const fillY = lerp(NECK_Y, TOP_Y, pct);
   const clipped = pts.filter(p => p.y >= fillY);
   if (!clipped.length) return null;
 
-  const p = new Path2D();
-  p.moveTo(clipped[0].x, clipped[0].y);
-  clipped.forEach(pt => p.lineTo(pt.x, pt.y));
-  [...clipped].reverse().forEach(pt => p.lineTo(NECK_X + (NECK_X - pt.x), pt.y));
-  p.closePath();
-  return p;
+  const path = new Path2D();
+  path.moveTo(clipped[0].x, clipped[0].y);
+  clipped.forEach(pt => path.lineTo(pt.x, pt.y));
+  [...clipped].reverse().forEach(pt => path.lineTo(NECK_X + (NECK_X - pt.x), pt.y));
+  path.closePath();
+
+  return path;
 }
 
-/** Areia no fundo — pct=0 vazio, pct=1 cheio */
 function makeBotSandPath(pct) {
   if (pct <= 0) return null;
   const steps = 50;
   const pts = [];
+
   for (let i = 0; i <= steps; i++) {
-    const t  = i / steps;
-    const y  = lerp(NECK_Y, BOT_Y, t);
+    const t = i / steps;
+    const y = lerp(NECK_Y, BOT_Y, t);
     const hw = lerp(NECK_W / 2, BOT_W / 2, t * (2 - t)) - GLASS_T;
-    pts.push({ x: NECK_X - hw, y, hw });
+    pts.push({ x: NECK_X - hw, y });
   }
+
   const fillY = lerp(NECK_Y, BOT_Y, pct);
   const clipped = pts.filter(p => p.y <= fillY);
   if (!clipped.length) return null;
 
-  const p = new Path2D();
+  const path = new Path2D();
   const rev = [...clipped].reverse();
-  p.moveTo(rev[0].x, rev[0].y);
-  rev.forEach(pt => p.lineTo(pt.x, pt.y));
-  clipped.forEach(pt => p.lineTo(NECK_X + (NECK_X - pt.x), pt.y));
-  p.closePath();
-  return p;
+  path.moveTo(rev[0].x, rev[0].y);
+  rev.forEach(pt => path.lineTo(pt.x, pt.y));
+  clipped.forEach(pt => path.lineTo(NECK_X + (NECK_X - pt.x), pt.y));
+  path.closePath();
+
+  return path;
 }
 
 // ============================================================
-//  PARTÍCULAS DE AREIA
+//  PARTÍCULAS
 // ============================================================
 class Particle {
   constructor() { this.reset(); }
 
   reset() {
-    this.x   = NECK_X + (Math.random() - 0.5) * NECK_W * 0.65;
-    this.y   = NECK_Y + 1;
-    this.vy  = 1.0 + Math.random() * 2.8;
-    this.vx  = (Math.random() - 0.5) * 0.9;
-    this.r   = 1.4 + Math.random() * 1.6;
-    const hue = 36 + Math.floor(Math.random() * 16);
-    const lgt = 52 + Math.floor(Math.random() * 22);
-    this.color = `hsla(${hue},82%,${lgt}%,${0.80 + Math.random() * 0.18})`;
+    this.x = NECK_X + (Math.random() - 0.5) * NECK_W;
+    this.y = NECK_Y;
+    this.vy = 1 + Math.random() * 3;
+    this.vx = (Math.random() - 0.5);
+    this.r = 1.5;
     this.alive = true;
   }
 
   update(botPct) {
-    this.vy += 0.20;           // gravidade
-    this.x  += this.vx;
-    this.y  += this.vy;
+    this.vy += 0.2;
+    this.y += this.vy;
+    this.x += this.vx;
 
-    // Colisão com paredes internas da metade inferior
-    const t  = Math.max(0, (this.y - NECK_Y) / (BOT_Y - NECK_Y));
-    const hw = lerp(NECK_W / 2, BOT_W / 2, t * (2 - t)) - GLASS_T - this.r;
-    if (this.x - NECK_X >  hw) { this.x = NECK_X +  hw; this.vx *= -0.25; }
-    if (this.x - NECK_X < -hw) { this.x = NECK_X + -hw; this.vx *= -0.25; }
+    const t = Math.max(0, (this.y - NECK_Y) / (BOT_Y - NECK_Y));
+    const hw = lerp(NECK_W / 2, BOT_W / 2, t * (2 - t)) - GLASS_T;
 
-    // "Chão" de areia acumulada
-    const floor = lerp(NECK_Y, BOT_Y, botPct) - this.r;
-    if (this.y >= floor) {
-      this.y  = floor;
-      this.vy = 0;
-      this.vx = 0;
-      this.alive = false;
-    }
-    if (this.y > BOT_Y) this.alive = false;
+    if (this.x > NECK_X + hw) this.x = NECK_X + hw;
+    if (this.x < NECK_X - hw) this.x = NECK_X - hw;
+
+    const floor = lerp(NECK_Y, BOT_Y, botPct);
+    if (this.y >= floor) this.alive = false;
   }
 
   draw() {
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-    ctx.fillStyle = this.color;
+    ctx.fillStyle = '#f5c542';
     ctx.fill();
   }
 }
 
 // ============================================================
-//  RENDERIZAÇÃO PRINCIPAL
+//  RENDER
 // ============================================================
 function render() {
   ctx.clearRect(0, 0, W, H);
 
-  const pct    = tempoTotal > 0 ? tempoRestante / tempoTotal : 1;
+  const pct = tempoTotal > 0 ? Math.max(0, tempoRestante / tempoTotal) : 1;
   const botPct = 1 - pct;
 
   const glassPath = makeGlassPath();
   const innerPath = makeInnerPath();
 
-  // ---- 1. Corpo do vidro (preenchimento semitransparente) ----
-  const glassGrad = ctx.createLinearGradient(NECK_X - TOP_W / 2, 0, NECK_X + TOP_W / 2, 0);
-  glassGrad.addColorStop(0,    'rgba(160, 210, 255, 0.32)');
-  glassGrad.addColorStop(0.18, 'rgba(255, 255, 255, 0.52)');
-  glassGrad.addColorStop(0.50, 'rgba(200, 235, 255, 0.16)');
-  glassGrad.addColorStop(0.82, 'rgba(255, 255, 255, 0.42)');
-  glassGrad.addColorStop(1,    'rgba(130, 195, 250, 0.28)');
-  ctx.fillStyle = glassGrad;
+  ctx.fillStyle = 'rgba(200,200,255,0.1)';
   ctx.fill(glassPath);
 
-  // ---- 2. Interior: areia + partículas (clip ao interior) ----
   ctx.save();
   ctx.clip(innerPath);
 
-  // Areia no topo
-  const topPath = makeTopSandPath(pct);
-  if (topPath) {
-    const sg = ctx.createLinearGradient(NECK_X - TOP_W / 2, TOP_Y, NECK_X + TOP_W / 2, NECK_Y);
-    sg.addColorStop(0,   '#e8b84b');
-    sg.addColorStop(0.4, '#d4922a');
-    sg.addColorStop(1,   '#c07818');
-    ctx.fillStyle = sg;
-    ctx.fill(topPath);
-    // Camada de brilho sobre a areia
-    ctx.fillStyle = 'rgba(255, 215, 100, 0.18)';
-    ctx.fill(topPath);
+  const top = makeTopSandPath(pct);
+  if (top) {
+    ctx.fillStyle = '#e0a800';
+    ctx.fill(top);
   }
 
-  // Areia no fundo
-  const botPath = makeBotSandPath(botPct);
-  if (botPath) {
-    const sg2 = ctx.createLinearGradient(NECK_X - BOT_W / 2, NECK_Y, NECK_X + BOT_W / 2, BOT_Y);
-    sg2.addColorStop(0,   '#c07818');
-    sg2.addColorStop(0.5, '#d4922a');
-    sg2.addColorStop(1,   '#e8b84b');
-    ctx.fillStyle = sg2;
-    ctx.fill(botPath);
-    ctx.fillStyle = 'rgba(255, 220, 120, 0.15)';
-    ctx.fill(botPath);
+  const bot = makeBotSandPath(botPct);
+  if (bot) {
+    ctx.fillStyle = '#c47a00';
+    ctx.fill(bot);
   }
 
-  // Partículas
   particles.forEach(p => p.draw());
-
   ctx.restore();
 
-  // ---- 3. Borda do vidro (reflexo realista) ----
-  const strokeGrad = ctx.createLinearGradient(NECK_X - TOP_W / 2, 0, NECK_X + TOP_W / 2, 0);
-  strokeGrad.addColorStop(0,    'rgba(110, 175, 240, 0.90)');
-  strokeGrad.addColorStop(0.18, 'rgba(255, 255, 255, 0.95)');
-  strokeGrad.addColorStop(0.50, 'rgba(180, 222, 255, 0.45)');
-  strokeGrad.addColorStop(0.82, 'rgba(255, 255, 255, 0.88)');
-  strokeGrad.addColorStop(1,    'rgba(100, 160, 220, 0.80)');
-  ctx.strokeStyle = strokeGrad;
-  ctx.lineWidth   = 2.5;
+  ctx.strokeStyle = '#aaa';
   ctx.stroke(glassPath);
-
-  // ---- 4. Reflexo lateral esquerdo (brilho do vidro) ----
-  ctx.save();
-  ctx.clip(glassPath);
-  const shine = ctx.createLinearGradient(
-    NECK_X - TOP_W / 2 + 5, TOP_Y,
-    NECK_X - TOP_W / 2 + 22, BOT_Y
-  );
-  shine.addColorStop(0,   'rgba(255,255,255,0.52)');
-  shine.addColorStop(0.28,'rgba(255,255,255,0.28)');
-  shine.addColorStop(0.65,'rgba(255,255,255,0.08)');
-  shine.addColorStop(1,   'rgba(255,255,255,0.00)');
-  ctx.fillStyle = shine;
-  ctx.beginPath();
-  ctx.moveTo(NECK_X - TOP_W / 2 + 7, TOP_Y);
-  ctx.quadraticCurveTo(
-    NECK_X - TOP_W / 2 + 5,  NECK_Y,
-    NECK_X - NECK_W / 2 + 2, NECK_Y
-  );
-  ctx.lineTo(NECK_X - NECK_W / 2 + GLASS_T + 5, NECK_Y);
-  ctx.quadraticCurveTo(
-    NECK_X - TOP_W / 2 + 18, NECK_Y,
-    NECK_X - TOP_W / 2 + 20, TOP_Y
-  );
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
-
-  // ---- 5. Tampas (latão/madeira) ----
-  const capH = 13, capW = TOP_W + 18;
-  const capGrad = ctx.createLinearGradient(NECK_X - capW / 2, 0, NECK_X + capW / 2, 0);
-  capGrad.addColorStop(0,    '#6b4c1a');
-  capGrad.addColorStop(0.25, '#b8832a');
-  capGrad.addColorStop(0.50, '#e8c46a');
-  capGrad.addColorStop(0.75, '#b8832a');
-  capGrad.addColorStop(1,    '#6b4c1a');
-
-  // Tampa superior
-  ctx.fillStyle = capGrad;
-  ctx.beginPath();
-  ctx.roundRect(NECK_X - capW / 2, TOP_Y - capH, capW, capH, [4, 4, 2, 2]);
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255, 220, 100, 0.35)';
-  ctx.lineWidth = 0.8;
-  ctx.stroke();
-
-  // Tampa inferior
-  ctx.beginPath();
-  ctx.roundRect(NECK_X - capW / 2, BOT_Y, capW, capH, [2, 2, 4, 4]);
-  ctx.fill();
-  ctx.stroke();
 }
 
 // ============================================================
-//  LOOP DE ANIMAÇÃO
+//  LOOP
 // ============================================================
-function spawnAndUpdateParticles() {
-  if (tempoRestante <= 0 || tempoTotal <= 0) return;
+function spawnParticles() {
+  if (tempoRestante <= 0) return;
 
   const now = Date.now();
-  if (now - lastSpawnTime > 55) {
+  if (now - lastSpawnTime > 60) {
     particles.push(new Particle());
-    if (Math.random() < 0.55) particles.push(new Particle());
     lastSpawnTime = now;
   }
 
   const botPct = 1 - (tempoRestante / tempoTotal);
   particles.forEach(p => p.update(botPct));
   particles = particles.filter(p => p.alive);
-  if (particles.length > 45) particles.splice(0, particles.length - 45);
 }
 
 function loop() {
-  spawnAndUpdateParticles();
+  spawnParticles();
   render();
-  animFrame = requestAnimationFrame(loop);
+  requestAnimationFrame(loop);
 }
 
 // ============================================================
-//  UTILITÁRIOS DE TEMPO
+//  TEMPO
 // ============================================================
-function formatTime(totalSeg) {
-  const m = Math.floor(totalSeg / 60);
-  const s = totalSeg % 60;
-  return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+function formatTime(t) {
+  const m = Math.floor(t / 60);
+  const s = t % 60;
+  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
 }
 
 function getInputSeconds() {
-  const min = parseInt(document.getElementById('minutos').value) || 0;
-  const seg = parseInt(document.getElementById('segundos').value) || 0;
+  let min = parseInt(document.getElementById('minutos').value) || 0;
+  let seg = parseInt(document.getElementById('segundos').value) || 0;
+
+  if (seg >= 60) {
+    min += Math.floor(seg / 60);
+    seg = seg % 60;
+  }
+
   return min * 60 + seg;
 }
 
@@ -341,41 +252,63 @@ function atualizarDisplay() {
 }
 
 // ============================================================
-//  CONTROLES PÚBLICOS
+//  CONTROLES
 // ============================================================
 function iniciar() {
   clearInterval(intervalo);
 
   const total = getInputSeconds();
-  if (total <= 0) {
-    alert('Digite um tempo válido (minutos e/ou segundos).');
-    return;
-  }
+  if (total <= 0) return alert('Tempo inválido');
 
-  tempoTotal     = total;
-  tempoRestante  = total;
-  particles      = [];
+  tempoTotal = total;
+  tempoRestante = total;
+  particles = [];
 
-  const doneEl = document.getElementById('done');
-  doneEl.textContent = '';
-  doneEl.classList.remove('visible');
-
-  const penEl = document.getElementById('penalidade');
-  penEl.classList.remove('visivel');
+  document.getElementById('penalidade').classList.remove('visivel');
 
   atualizarDisplay();
 
-  intervalo = setInterval(() => {
-    tempoRestante--;
+  intervalo = setInterval(tick, 1000);
+}
+
+function setTempo(segundos) {
+  clearInterval(intervalo);
+
+  tempoTotal = segundos;
+  tempoRestante = segundos;
+  particles = [];
+
+  document.getElementById('minutos').value = Math.floor(segundos / 60);
+  document.getElementById('segundos').value = segundos % 60;
+
+  document.getElementById('penalidade').classList.remove('visivel');
+
+  atualizarDisplay();
+
+  intervalo = setInterval(tick, 1000);
+}
+
+function tick() {
+  tempoRestante--;
+  atualizarDisplay();
+
+  if (tempoRestante <= 0) {
+    clearInterval(intervalo);
+    tempoRestante = 0;
     atualizarDisplay();
 
-    if (tempoRestante <= 0) {
-      clearInterval(intervalo);
-      particles = [];
-      penEl.classList.add('visivel');
-      penEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    particles = [];
+
+    document.getElementById('penalidade').classList.add('visivel');
+
+    // vibração (mobile)
+    if (navigator.vibrate) {
+      navigator.vibrate([200,100,200]);
     }
-  }, 1000);
+
+    // som (opcional)
+    // new Audio('som.mp3').play();
+  }
 }
 
 function pausar() {
@@ -385,19 +318,14 @@ function pausar() {
 function resetar() {
   clearInterval(intervalo);
   tempoRestante = 0;
-  tempoTotal    = 0;
-  particles     = [];
+  tempoTotal = 0;
+  particles = [];
 
-  document.getElementById('display').textContent = '00:00';
-  const doneEl = document.getElementById('done');
-  doneEl.textContent = '';
-  doneEl.classList.remove('visible');
-
+  atualizarDisplay();
   document.getElementById('penalidade').classList.remove('visivel');
 }
 
 // ============================================================
-//  INICIA O LOOP
+//  START
 // ============================================================
-if (animFrame) cancelAnimationFrame(animFrame);
 loop();
