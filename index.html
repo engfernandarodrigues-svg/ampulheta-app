@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Ampulheta</title>
+  <title>Ampulheta Pro</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -24,12 +24,28 @@
 
   <div id="tempo">00:00</div>
 
+  <!-- Ampulheta real -->
   <div class="ampulheta">
-    <div class="topo" id="topo"></div>
-    <div class="fundo" id="fundo"></div>
+    <div class="top-sand" id="topo"></div>
+    <div class="bottom-sand" id="fundo"></div>
+    <div class="flow" id="flow"></div>
+  </div>
+
+  <!-- Resultado -->
+  <div id="fim" class="hidden">
+    <h2>😅 Ih vou ter que trazer bolo!</h2>
+    <img src="https://cdn-icons-png.flaticon.com/512/992/992754.png">
+  </div>
+
+  <!-- Ranking -->
+  <div class="ranking">
+    <h3>🏆 Ranking do Bolo</h3>
+    <ul id="rankingLista"></ul>
   </div>
 
 </div>
+
+<audio id="somFinal" src="https://www.soundjay.com/misc/sounds/fail-buzzer-02.mp3"></audio>
 
 <script src="script.js"></script>
 </body>
