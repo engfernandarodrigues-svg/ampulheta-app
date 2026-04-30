@@ -51,6 +51,12 @@ body {
   margin-bottom: 28px;
 }
 
+.logo {
+  width: 100%;
+  max-width: 120px;
+  height: auto;
+}
+
 /* ===== Controles ===== */
 .controls {
   display: flex;
