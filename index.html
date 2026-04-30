@@ -5,62 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ampulheta</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+  <div class="app">
 
-<div class="app">
+    <h1 class="title">Ampulheta</h1>
+    <p class="subtitle">Temporizador</p>
 
-  <!-- LOGO -->
-  <div class="logo-container">
-    <img src="./logo.png" class="logo">
-  </div>
+    <div class="controls">
+      <div class="time-inputs">
+        <div class="input-group">
+          <label>Min</label>
+          <input type="number" id="minutos" min="0" max="99" value="0">
+        </div>
 
-  <div class="controls">
+        <span class="sep">:</span>
 
-    <div class="time-inputs">
-      <div class="input-group">
-        <label>Min</label>
-        <input type="number" id="minutos" value="0">
+        <div class="input-group">
+          <label>Seg</label>
+          <input type="number" id="segundos" min="0" max="59" value="0">
+        </div>
       </div>
 
-      <span class="sep">:</span>
-
-      <div class="input-group">
-        <label>Seg</label>
-        <input type="number" id="segundos" value="0">
+      <div class="buttons">
+        <button class="btn primary" onclick="iniciar()">Iniciar</button>
+        <button class="btn" onclick="pausar()">Pausar</button>
+        <button class="btn" onclick="resetar()">Resetar</button>
       </div>
     </div>
 
-    <!-- BOTÕES RÁPIDOS -->
-    <div class="quick-times">
-      <button class="btn quick" onclick="setTempo(75)">1:15</button>
-      <button class="btn quick" onclick="setTempo(90)">1:30</button>
-      <button class="btn quick" onclick="setTempo(120)">2:00</button>
-    </div>
+    <div class="display" id="display">00:00</div>
 
-    <div class="buttons">
-      <button class="btn primary" onclick="iniciar()">Iniciar</button>
-      <button class="btn" onclick="pausar()">Pausar</button>
-      <button class="btn" onclick="resetar()">Resetar</button>
+    <canvas id="hg" width="220" height="340"></canvas>
+
+    <div class="penalidade" id="penalidade">
+      <p class="penalidade-texto">Ih, vou ter que trazer bolo!</p>
+      <svg class="bolo-svg" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="60" fill="#e74c3c"/>
+        <text x="100" y="110" text-anchor="middle" fill="#fff" font-size="16">🎂</text>
+      </svg>
+      <p class="penalidade-sub">Você estourou o tempo!</p>
     </div>
 
   </div>
 
-  <div class="display" id="display">00:00</div>
-
-  <canvas id="hg" width="220" height="340"></canvas>
-
-  <div class="penalidade" id="penalidade">
-    <p>🎂 Você perdeu!</p>
-  </div>
-
-</div>
-
-<!-- explosão -->
-<div id="explosao"></div>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
