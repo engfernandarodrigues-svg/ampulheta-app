@@ -1,0 +1,73 @@
+body {
+  margin: 0;
+  font-family: Arial;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.inputs input {
+  width: 80px;
+  padding: 10px;
+  font-size: 18px;
+  margin: 5px;
+  text-align: center;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 10px 5px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+#tempo {
+  font-size: 48px;
+  margin: 20px;
+}
+
+.ampulheta {
+  position: relative;
+  width: 120px;
+  height: 220px;
+  margin: auto;
+  border: 4px solid white;
+  border-radius: 60px;
+  overflow: hidden;
+}
+
+.topo, .fundo {
+  position: absolute;
+  width: 100%;
+  background: gold;
+  transition: height 1s linear;
+}
+
+.topo {
+  top: 0;
+  height: 100%;
+}
+
+.fundo {
+  bottom: 0;
+  height: 0%;
+}
