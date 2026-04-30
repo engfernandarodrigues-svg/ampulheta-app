@@ -16,6 +16,9 @@ function iniciar() {
   }
 
   restante = total;
+
+  document.getElementById("fim").classList.add("hidden");
+
   atualizar();
 
   intervalo = setInterval(() => {
@@ -24,20 +27,9 @@ function iniciar() {
 
     if (restante <= 0) {
       clearInterval(intervalo);
-      alert("⏳ Tempo acabou!");
+      finalizou();
     }
   }, 1000);
-}
-
-function pausar() {
-  clearInterval(intervalo);
-}
-
-function resetar() {
-  clearInterval(intervalo);
-  restante = 0;
-  total = 0;
-  atualizar();
 }
 
 function atualizar() {
@@ -50,7 +42,60 @@ function atualizar() {
   if (total > 0) {
     let p = restante / total;
 
-    document.getElementById("topo").style.height = (p * 100) + "%";
-    document.getElementById("fundo").style.height = ((1 - p) * 100) + "%";
+    document.getElementById("topo").style.height = (p * 50) + "%";
+    document.getElementById("fundo").style.height = ((1 - p) * 50) + "%";
   }
 }
+
+function pausar() {
+  clearInterval(intervalo);
+}
+
+function resetar() {
+  clearInterval(intervalo);
+  restante = 0;
+  total = 0;
+  atualizar();
+  document.getElementById("fim").classList.add("hidden");
+}
+
+function finalizou() {
+  document.getElementById("fim").classList.remove("hidden");
+
+  // som
+  document.getElementById("somFinal").play();
+
+  // efeito explosão
+  document.body.classList.add("explodir");
+
+  setTimeout(() => {
+    document.body.classList.remove("explodir");
+  }, 500);
+
+  salvarRanking();
+}
+
+function salvarRanking() {
+  let ranking = JSON.parse(localStorage.getItem("ranking")) || [];
+
+  ranking.push("Perdeu 😅");
+
+  localStorage.setItem("ranking", JSON.stringify(ranking));
+
+  mostrarRanking();
+}
+
+function mostrarRanking() {
+  let lista = document.getElementById("rankingLista");
+  let ranking = JSON.parse(localStorage.getItem("ranking")) || [];
+
+  lista.innerHTML = "";
+
+  ranking.forEach((item, i) => {
+    let li = document.createElement("li");
+    li.innerText = `#${i + 1} - ${item}`;
+    lista.appendChild(li);
+  });
+}
+
+mostrarRanking();
