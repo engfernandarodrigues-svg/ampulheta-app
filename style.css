@@ -1,9 +1,6 @@
 body {
   font-family: 'Lato', sans-serif;
-  background: #0b0613;
-  background-image:
-    radial-gradient(ellipse at 30% 20%, rgba(120, 60, 180, 0.25) 0%, transparent 55%),
-    radial-gradient(ellipse at 70% 80%, rgba(60, 20, 100, 0.30) 0%, transparent 55%);
+  background: #0d0d0f;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -11,95 +8,56 @@ body {
   color: #e8dcc8;
 }
 
-/* container */
 .app {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 40px;
+  background: rgba(255,255,255,0.03);
   border-radius: 20px;
 }
 
-/* logo */
-.logo-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 15px;
+.title {
+  font-family: 'Cinzel', serif;
+  color: #e8c96a;
 }
 
-.logo {
-  max-width: 180px;
-  width: 100%;
+.subtitle {
+  font-size: 12px;
+  margin-bottom: 20px;
 }
 
-/* inputs */
 .time-inputs {
   display: flex;
-  gap: 6px;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  gap: 5px;
 }
 
 input {
-  width: 70px;
+  width: 60px;
   text-align: center;
 }
 
-/* botões */
-.buttons, .quick-times {
+.buttons {
   margin-top: 10px;
 }
 
 .btn {
-  padding: 8px 14px;
-  margin: 3px;
+  padding: 8px 12px;
+  margin: 2px;
   cursor: pointer;
 }
 
-.btn.primary {
-  background: purple;
-  color: white;
-}
-
-/* display */
 .display {
-  font-size: 40px;
-  margin: 20px;
+  font-size: 32px;
+  margin: 15px;
 }
 
-/* penalidade */
 .penalidade {
   display: none;
 }
 
 .penalidade.visivel {
-  display: block;
-}
-
-/* explosão */
-#explosao {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-}
-
-.particula-explosao {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: white;
-  animation: explode 700ms forwards;
-}
-
-@keyframes explode {
-  to {
-    transform: translate(var(--x), var(--y));
-    opacity: 0;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
