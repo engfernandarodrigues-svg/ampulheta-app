@@ -2,7 +2,9 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ampulheta</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -22,7 +24,9 @@
         <label>Min</label>
         <input type="number" id="minutos" value="0">
       </div>
+
       <span class="sep">:</span>
+
       <div class="input-group">
         <label>Seg</label>
         <input type="number" id="segundos" value="0">
@@ -31,27 +35,30 @@
 
     <!-- BOTÕES RÁPIDOS -->
     <div class="quick-times">
-      <button onclick="setTempo(75)">1:15</button>
-      <button onclick="setTempo(90)">1:30</button>
-      <button onclick="setTempo(120)">2:00</button>
+      <button class="btn quick" onclick="setTempo(75)">1:15</button>
+      <button class="btn quick" onclick="setTempo(90)">1:30</button>
+      <button class="btn quick" onclick="setTempo(120)">2:00</button>
     </div>
 
     <div class="buttons">
-      <button onclick="iniciar()">Iniciar</button>
-      <button onclick="pausar()">Pausar</button>
-      <button onclick="resetar()">Resetar</button>
+      <button class="btn primary" onclick="iniciar()">Iniciar</button>
+      <button class="btn" onclick="pausar()">Pausar</button>
+      <button class="btn" onclick="resetar()">Resetar</button>
     </div>
 
   </div>
 
-  <div id="display">00:00</div>
+  <div class="display" id="display">00:00</div>
 
   <canvas id="hg" width="220" height="340"></canvas>
 
-  <div id="penalidade">🎂 Você perdeu!</div>
+  <div class="penalidade" id="penalidade">
+    <p>🎂 Você perdeu!</p>
+  </div>
 
 </div>
 
+<!-- explosão -->
 <div id="explosao"></div>
 
 <script src="script.js"></script>
