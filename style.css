@@ -52,9 +52,8 @@ body {
 }
 
 .logo {
-  width: 100%;
   max-width: 140px;
-  height: auto;
+  filter: drop-shadow(0 0 20px rgba(180, 100, 255, 0.6));
 }
 
 /* ===== Controles ===== */
