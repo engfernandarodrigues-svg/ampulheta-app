@@ -1,56 +1,105 @@
 body {
-  background: #0b0613;
   font-family: 'Lato', sans-serif;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  color:#fff;
+  background: #0b0613;
+  background-image:
+    radial-gradient(ellipse at 30% 20%, rgba(120, 60, 180, 0.25) 0%, transparent 55%),
+    radial-gradient(ellipse at 70% 80%, rgba(60, 20, 100, 0.30) 0%, transparent 55%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e8dcc8;
 }
 
+/* container */
 .app {
-  text-align:center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  border-radius: 20px;
+}
+
+/* logo */
+.logo-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
 }
 
 .logo {
-  width:200px;
-  margin-bottom:20px;
+  max-width: 180px;
+  width: 100%;
+}
+
+/* inputs */
+.time-inputs {
+  display: flex;
+  gap: 6px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 input {
-  width:60px;
-  text-align:center;
-  font-size:18px;
+  width: 70px;
+  text-align: center;
 }
 
-button {
-  margin:5px;
-  padding:8px 12px;
-  cursor:pointer;
+/* botões */
+.buttons, .quick-times {
+  margin-top: 10px;
 }
 
-#display {
-  font-size:40px;
-  margin:20px;
+.btn {
+  padding: 8px 14px;
+  margin: 3px;
+  cursor: pointer;
 }
 
-canvas {
-  margin-top:10px;
+.btn.primary {
+  background: purple;
+  color: white;
+}
+
+/* display */
+.display {
+  font-size: 40px;
+  margin: 20px;
+}
+
+/* penalidade */
+.penalidade {
+  display: none;
+}
+
+.penalidade.visivel {
+  display: block;
 }
 
 /* explosão */
+#explosao {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+}
+
 .particula-explosao {
-  position:absolute;
-  width:6px;
-  height:6px;
-  border-radius:50%;
-  background:white;
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: white;
   animation: explode 700ms forwards;
 }
 
 @keyframes explode {
   to {
     transform: translate(var(--x), var(--y));
-    opacity:0;
+    opacity: 0;
   }
 }
