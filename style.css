@@ -51,11 +51,6 @@ body {
   margin-bottom: 28px;
 }
 
-.logo {
-  max-width: 140px;
-  filter: drop-shadow(0 0 20px rgba(100, 100, 255, 0.6));
-}
-
 /* ===== Controles ===== */
 .controls {
   display: flex;
