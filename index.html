@@ -7,16 +7,30 @@
 </head>
 <body>
 
-  <div class="container">
-    <h1>⏳ Ampulheta</h1>
+<div class="container">
 
-    <input type="number" id="tempo" placeholder="Tempo em segundos">
-    
-    <button onclick="iniciar()">Iniciar</button>
+  <h1>⏳ Ampulheta</h1>
 
-    <div id="display">0</div>
+  <div class="inputs">
+    <input type="number" id="minutos" placeholder="Min" min="0">
+    <input type="number" id="segundos" placeholder="Seg" min="0">
   </div>
 
-  <script src="script.js"></script>
+  <div class="botoes">
+    <button onclick="iniciar()">Iniciar</button>
+    <button onclick="pausar()">Pausar</button>
+    <button onclick="resetar()">Resetar</button>
+  </div>
+
+  <div id="tempo">00:00</div>
+
+  <div class="ampulheta">
+    <div class="topo" id="topo"></div>
+    <div class="fundo" id="fundo"></div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
