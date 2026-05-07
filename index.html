@@ -1,27 +1,34 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
   <title>Ampulheta Pro</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
+
 </head>
+
 <body>
 
-<div class="bg-glow"></div>
+<div class="bg"></div>
 
 <div class="app">
 
   <!-- LOGO -->
-  <div class="logo-container">
+  <div class="logo-wrap">
     <img src="./logo.png" class="logo">
   </div>
 
   <!-- MODOS -->
-  <div class="view-switch">
+  <div class="mode-switch">
 
     <button class="mode active" onclick="setView('hourglass')">
       Ampulheta
@@ -33,83 +40,93 @@
 
   </div>
 
-  <!-- CONTROLES -->
-  <div class="controls">
-
-    <div class="time-inputs">
-
-      <div class="input-group">
-        <label>Min</label>
-        <input type="number" id="minutos" value="0">
-      </div>
-
-      <span class="sep">:</span>
-
-      <div class="input-group">
-        <label>Seg</label>
-        <input type="number" id="segundos" value="0">
-      </div>
-
-    </div>
-
-    <!-- BOTÕES RÁPIDOS -->
-    <div class="quick-times">
-      <button class="btn quick" onclick="setTempo(75)">1:15</button>
-      <button class="btn quick" onclick="setTempo(90)">1:30</button>
-      <button class="btn quick" onclick="setTempo(120)">2:00</button>
-      <button class="btn quick" onclick="setTempo(300)">5:00</button>
-    </div>
-
-    <!-- BOTÕES -->
-    <div class="buttons">
-      <button class="btn primary" onclick="iniciar()">Iniciar</button>
-      <button class="btn" onclick="pausar()">Pausar</button>
-      <button class="btn" onclick="resetar()">Resetar</button>
-    </div>
-
-  </div>
-
-  <!-- DISPLAY -->
-  <div class="display" id="display">00:00</div>
-
-  <!-- VISUAIS -->
-  <div class="visual-container">
+  <!-- CARD VISUAL -->
+  <div class="visual-card">
 
     <!-- AMPULHETA -->
-    <canvas id="hg" width="280" height="420"></canvas>
+    <div class="hourglass-view" id="hourglassView">
+
+      <canvas id="hourglassCanvas" width="320" height="420"></canvas>
+
+    </div>
 
     <!-- CIRCULAR -->
-    <div class="circle-wrapper hidden" id="circleWrapper">
+    <div class="circle-view hidden" id="circleView">
 
-      <svg class="progress-ring" width="260" height="260">
+      <svg class="ring" width="300" height="300">
 
         <circle
           class="ring-bg"
-          cx="130"
-          cy="130"
-          r="110">
+          cx="150"
+          cy="150"
+          r="120">
         </circle>
 
         <circle
           class="ring-progress"
-          cx="130"
-          cy="130"
-          r="110">
+          cx="150"
+          cy="150"
+          r="120">
         </circle>
 
       </svg>
 
-      <div class="circle-time" id="circleTime">
-        00:00
+      <div class="circle-center">
+
+        <div class="circle-time" id="circleTime">
+          01:30
+        </div>
+
       </div>
 
     </div>
 
+    <!-- TEMPO -->
+    <div class="main-time" id="display">
+      01:30
+    </div>
+
+    <div class="time-labels">
+      <span>MINUTOS</span>
+      <span>SEGUNDOS</span>
+    </div>
+
   </div>
 
-  <!-- PENALIDADE -->
-  <div class="penalidade" id="penalidade">
-    <p>🎂 Você perdeu!</p>
+  <!-- TEMPO FIXO -->
+  <div class="time-pill">
+    ⏱ 1:30
+  </div>
+
+  <!-- CONTROLES -->
+  <div class="controls">
+
+    <button class="control primary" onclick="iniciar()">
+      ▶ Iniciar
+    </button>
+
+    <button class="control" onclick="pausar()">
+      ❚❚ Pausar
+    </button>
+
+    <button class="control" onclick="resetar()">
+      ↻ Resetar
+    </button>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-card">
+
+    <div class="footer-icon">
+      ✦
+    </div>
+
+    <div>
+      <h3>Foco, disciplina e automação</h3>
+      <p>Transforme processos em resultados.</p>
+    </div>
+
   </div>
 
 </div>
