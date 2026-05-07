@@ -3,12 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ampulheta</title>
+  <title>Ampulheta Pro</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<div class="bg-glow"></div>
 
 <div class="app">
 
@@ -17,9 +20,24 @@
     <img src="./logo.png" class="logo">
   </div>
 
+  <!-- MODOS -->
+  <div class="view-switch">
+
+    <button class="mode active" onclick="setView('hourglass')">
+      Ampulheta
+    </button>
+
+    <button class="mode" onclick="setView('circle')">
+      Circular
+    </button>
+
+  </div>
+
+  <!-- CONTROLES -->
   <div class="controls">
 
     <div class="time-inputs">
+
       <div class="input-group">
         <label>Min</label>
         <input type="number" id="minutos" value="0">
@@ -31,6 +49,7 @@
         <label>Seg</label>
         <input type="number" id="segundos" value="0">
       </div>
+
     </div>
 
     <!-- BOTÕES RÁPIDOS -->
@@ -38,8 +57,10 @@
       <button class="btn quick" onclick="setTempo(75)">1:15</button>
       <button class="btn quick" onclick="setTempo(90)">1:30</button>
       <button class="btn quick" onclick="setTempo(120)">2:00</button>
+      <button class="btn quick" onclick="setTempo(300)">5:00</button>
     </div>
 
+    <!-- BOTÕES -->
     <div class="buttons">
       <button class="btn primary" onclick="iniciar()">Iniciar</button>
       <button class="btn" onclick="pausar()">Pausar</button>
@@ -48,19 +69,52 @@
 
   </div>
 
+  <!-- DISPLAY -->
   <div class="display" id="display">00:00</div>
 
-  <canvas id="hg" width="220" height="340"></canvas>
+  <!-- VISUAIS -->
+  <div class="visual-container">
 
+    <!-- AMPULHETA -->
+    <canvas id="hg" width="280" height="420"></canvas>
+
+    <!-- CIRCULAR -->
+    <div class="circle-wrapper hidden" id="circleWrapper">
+
+      <svg class="progress-ring" width="260" height="260">
+
+        <circle
+          class="ring-bg"
+          cx="130"
+          cy="130"
+          r="110">
+        </circle>
+
+        <circle
+          class="ring-progress"
+          cx="130"
+          cy="130"
+          r="110">
+        </circle>
+
+      </svg>
+
+      <div class="circle-time" id="circleTime">
+        00:00
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- PENALIDADE -->
   <div class="penalidade" id="penalidade">
     <p>🎂 Você perdeu!</p>
   </div>
 
 </div>
 
-<!-- explosão -->
-<div id="explosao"></div>
-
 <script src="script.js"></script>
+
 </body>
 </html>
