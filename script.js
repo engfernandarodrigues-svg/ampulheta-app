@@ -1,19 +1,11 @@
-// ============================================
-// CONFIG
-// ============================================
-
 const canvas =
-document.getElementById('hourglassCanvas');
+document.getElementById('canvas');
 
 const ctx =
 canvas.getContext('2d');
 
 const W = 320;
-const H = 420;
-
-// ============================================
-// TIMER
-// ============================================
+const H = 470;
 
 let tempoTotal = 90;
 let tempoRestante = 90;
@@ -22,38 +14,27 @@ let intervalo = null;
 
 let currentView = 'hourglass';
 
-// ============================================
-// PARTICULAS
-// ============================================
-
 let particles = [];
 
-// ============================================
-// PARTICLE
-// ============================================
+/* PARTICLE */
 
 class Particle{
 
   constructor(){
 
-    this.reset();
-  }
-
-  reset(){
-
     this.x =
-      W/2 + (Math.random()-.5)*8;
+      W/2 + (Math.random()-.5)*10;
 
-    this.y = 185;
-
-    this.vx =
-      (Math.random()-.5)*.3;
+    this.y = 200;
 
     this.vy =
-      2 + Math.random()*1.5;
+      2 + Math.random()*2;
+
+    this.vx =
+      (Math.random()-.5)*.4;
 
     this.r =
-      .8 + Math.random()*1.2;
+      .8 + Math.random()*1.5;
 
     this.alpha =
       .5 + Math.random()*0.5;
@@ -67,7 +48,7 @@ class Particle{
     this.x += this.vx;
 
     const floor =
-      305 - (fill*95);
+      330 - (fill*100);
 
     if(this.y >= floor){
 
@@ -88,15 +69,13 @@ class Particle{
     );
 
     ctx.fillStyle =
-      `rgba(255,210,90,${this.alpha})`;
+      `rgba(255,210,80,${this.alpha})`;
 
     ctx.fill();
   }
 }
 
-// ============================================
-// AMPULHETA
-// ============================================
+/* AMPULHETA */
 
 function drawHourglass(){
 
@@ -112,16 +91,16 @@ function drawHourglass(){
   const glow =
     ctx.createRadialGradient(
       W/2,
-      210,
-      30,
+      240,
+      40,
       W/2,
-      210,
+      240,
       180
     );
 
   glow.addColorStop(
     0,
-    'rgba(170,90,255,.12)'
+    'rgba(180,100,255,.12)'
   );
 
   glow.addColorStop(
@@ -132,6 +111,38 @@ function drawHourglass(){
   ctx.fillStyle = glow;
 
   ctx.fillRect(0,0,W,H);
+
+  // base
+  ctx.fillStyle =
+    '#2a1145';
+
+  ctx.beginPath();
+
+  ctx.ellipse(
+    160,
+    45,
+    95,
+    16,
+    0,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+  ctx.beginPath();
+
+  ctx.ellipse(
+    160,
+    410,
+    95,
+    18,
+    0,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
 
   // vidro
   const glass =
@@ -149,79 +160,75 @@ function drawHourglass(){
 
   glass.addColorStop(
     .5,
-    'rgba(255,255,255,.04)'
+    'rgba(255,255,255,.03)'
   );
 
   glass.addColorStop(
     1,
-    'rgba(255,255,255,.16)'
+    'rgba(255,255,255,.14)'
   );
 
   ctx.fillStyle = glass;
 
   ctx.beginPath();
 
-  ctx.moveTo(90,40);
+  ctx.moveTo(95,55);
 
   ctx.bezierCurveTo(
     90,
-    120,
-    120,
-    150,
-    145,
-    190
-  );
-
-  ctx.bezierCurveTo(
-    165,
-    210,
-    165,
-    210,
+    160,
+    125,
     175,
-    190
-  );
-
-  ctx.bezierCurveTo(
-    200,
-    150,
-    230,
-    120,
-    230,
-    40
-  );
-
-  ctx.lineTo(230,40);
-
-  ctx.lineTo(230,40);
-
-  ctx.bezierCurveTo(
-    230,
-    120,
-    200,
-    270,
-    175,
-    230
-  );
-
-  ctx.bezierCurveTo(
-    165,
-    210,
-    165,
-    210,
     145,
-    230
+    205
   );
 
   ctx.bezierCurveTo(
-    120,
-    270,
-    90,
-    300,
-    90,
-    380
+    155,
+    220,
+    165,
+    220,
+    175,
+    205
   );
 
-  ctx.lineTo(230,380);
+  ctx.bezierCurveTo(
+    195,
+    175,
+    230,
+    160,
+    225,
+    55
+  );
+
+  ctx.lineTo(225,55);
+
+  ctx.bezierCurveTo(
+    230,
+    280,
+    195,
+    295,
+    175,
+    260
+  );
+
+  ctx.bezierCurveTo(
+    165,
+    245,
+    155,
+    245,
+    145,
+    260
+  );
+
+  ctx.bezierCurveTo(
+    125,
+    295,
+    90,
+    280,
+    95,
+    410
+  );
 
   ctx.strokeStyle =
     'rgba(255,255,255,.35)';
@@ -232,20 +239,20 @@ function drawHourglass(){
 
   // areia superior
   const topHeight =
-    95 * progress;
+    90 * progress;
 
   ctx.beginPath();
 
-  ctx.moveTo(112,160-topHeight);
+  ctx.moveTo(115,180-topHeight);
 
-  ctx.lineTo(208,160-topHeight);
+  ctx.lineTo(205,180-topHeight);
 
-  ctx.lineTo(160,188);
+  ctx.lineTo(160,205);
 
   ctx.closePath();
 
   ctx.fillStyle =
-    '#d69d18';
+    '#d59a12';
 
   ctx.fill();
 
@@ -254,9 +261,9 @@ function drawHourglass(){
 
     ctx.beginPath();
 
-    ctx.moveTo(160,190);
+    ctx.moveTo(160,205);
 
-    ctx.lineTo(160,270);
+    ctx.lineTo(160,300);
 
     ctx.strokeStyle =
       '#f4c542';
@@ -268,20 +275,20 @@ function drawHourglass(){
 
   // areia inferior
   const bottomHeight =
-    95 * bottomFill;
+    90 * bottomFill;
 
   ctx.beginPath();
 
-  ctx.moveTo(110,315);
+  ctx.moveTo(112,340);
 
-  ctx.lineTo(210,315);
+  ctx.lineTo(208,340);
 
-  ctx.lineTo(160,315-bottomHeight);
+  ctx.lineTo(160,340-bottomHeight);
 
   ctx.closePath();
 
   ctx.fillStyle =
-    '#c47a00';
+    '#c77d00';
 
   ctx.fill();
 
@@ -296,24 +303,22 @@ function drawHourglass(){
   particles =
     particles.filter(p=>p.alive);
 
-  // brilho
+  // brilho vidro
   ctx.beginPath();
 
-  ctx.moveTo(118,65);
+  ctx.moveTo(122,75);
 
-  ctx.lineTo(135,175);
+  ctx.lineTo(138,190);
 
   ctx.strokeStyle =
     'rgba(255,255,255,.18)';
 
-  ctx.lineWidth = 5;
+  ctx.lineWidth = 6;
 
   ctx.stroke();
 }
 
-// ============================================
-// LOOP
-// ============================================
+/* LOOP */
 
 function animate(){
 
@@ -321,7 +326,7 @@ function animate(){
 
     if(
       tempoRestante > 0 &&
-      Math.random() > .25
+      Math.random() > .2
     ){
 
       particles.push(
@@ -332,14 +337,14 @@ function animate(){
     drawHourglass();
   }
 
-  requestAnimationFrame(animate);
+  requestAnimationFrame(
+    animate
+  );
 }
 
 animate();
 
-// ============================================
-// FORMAT
-// ============================================
+/* FORMAT */
 
 function formatTime(t){
 
@@ -352,9 +357,7 @@ function formatTime(t){
   return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
-// ============================================
-// DISPLAY
-// ============================================
+/* DISPLAY */
 
 function updateDisplay(){
 
@@ -374,9 +377,7 @@ function updateDisplay(){
 
 updateDisplay();
 
-// ============================================
-// CIRCLE
-// ============================================
+/* CIRCLE */
 
 function updateCircle(){
 
@@ -400,9 +401,7 @@ function updateCircle(){
     circumference * (1-progress);
 }
 
-// ============================================
-// TICK
-// ============================================
+/* TICK */
 
 function tick(){
 
@@ -417,19 +416,10 @@ function tick(){
     clearInterval(intervalo);
 
     updateDisplay();
-
-    if(navigator.vibrate){
-
-      navigator.vibrate(
-        [200,100,200]
-      );
-    }
   }
 }
 
-// ============================================
-// START
-// ============================================
+/* START */
 
 function iniciar(){
 
@@ -439,31 +429,26 @@ function iniciar(){
     setInterval(tick,1000);
 }
 
-// ============================================
-// PAUSE
-// ============================================
+/* PAUSE */
 
 function pausar(){
 
   clearInterval(intervalo);
 }
 
-// ============================================
-// RESET
-// ============================================
+/* RESET */
 
 function resetar(){
 
   clearInterval(intervalo);
 
-  tempoRestante = tempoTotal;
+  tempoRestante =
+    tempoTotal;
 
   updateDisplay();
 }
 
-// ============================================
-// VIEW
-// ============================================
+/* VIEW */
 
 function setView(view){
 
@@ -480,7 +465,7 @@ function setView(view){
     );
 
   document
-    .querySelectorAll('.mode')
+    .querySelectorAll('.switch-btn')
     .forEach(btn=>
       btn.classList.remove('active')
     );
@@ -496,7 +481,7 @@ function setView(view){
     );
 
     document
-      .querySelectorAll('.mode')[0]
+      .querySelectorAll('.switch-btn')[0]
       .classList.add('active');
 
   } else {
@@ -510,7 +495,7 @@ function setView(view){
     );
 
     document
-      .querySelectorAll('.mode')[1]
+      .querySelectorAll('.switch-btn')[1]
       .classList.add('active');
   }
 }
