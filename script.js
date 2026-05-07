@@ -1,331 +1,443 @@
-// ============================================================
-//  AMPULHETA PRO — script.js (VERSÃO ATUALIZADA)
-// ============================================================
+// ======================================================
+// CONFIG
+// ======================================================
 
 const canvas = document.getElementById('hg');
-const ctx    = canvas.getContext('2d');
-const W = 220, H = 340;
+const ctx = canvas.getContext('2d');
 
-// ---- Estado do timer ----
-let intervalo      = null;
-let tempoRestante  = 0;
-let tempoTotal     = 0;
+const W = 280;
+const H = 420;
 
-// ---- Estado das partículas ----
-let particles      = [];
-let animFrame      = null;
-let lastSpawnTime  = 0;
+// ======================================================
+// TIMER
+// ======================================================
 
-// ---- Geometria ----
-const NECK_X = W / 2;
-const NECK_Y = H / 2;
-const TOP_Y  = 32;
-const BOT_Y  = H - 32;
-const TOP_W  = 80;
-const BOT_W  = 80;
-const NECK_W = 7;
-const GLASS_T = 6;
+let intervalo = null;
 
-// ============================================================
-//  UTIL
-// ============================================================
-function lerp(a, b, t) { return a + (b - a) * t; }
+let tempoRestante = 0;
+let tempoTotal = 0;
 
-// ============================================================
-//  GEOMETRIA
-// ============================================================
-function buildSide(side, steps = 50) {
-  const pts = [];
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    const y = lerp(TOP_Y, NECK_Y, t);
-    const hw = lerp(TOP_W / 2, NECK_W / 2, t * t);
-    pts.push({ x: NECK_X + side * hw, y });
-  }
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    const y = lerp(NECK_Y, BOT_Y, t);
-    const hw = lerp(NECK_W / 2, BOT_W / 2, t * (2 - t));
-    pts.push({ x: NECK_X + side * hw, y });
-  }
-  return pts;
-}
+let currentView = 'hourglass';
 
-const outerLeft  = buildSide(-1);
-const outerRight = buildSide(1);
+// ======================================================
+// GEOMETRIA
+// ======================================================
 
-function makeGlassPath() {
-  const p = new Path2D();
-  p.moveTo(outerLeft[0].x, outerLeft[0].y);
-  outerLeft.forEach(pt => p.lineTo(pt.x, pt.y));
-  [...outerRight].reverse().forEach(pt => p.lineTo(pt.x, pt.y));
-  p.closePath();
-  return p;
-}
+const centerX = W / 2;
+const centerY = H / 2;
 
-function makeInnerPath() {
-  const p = new Path2D();
-  const inL = outerLeft.map(pt => ({ x: pt.x + GLASS_T, y: pt.y }));
-  const inR = outerRight.map(pt => ({ x: pt.x - GLASS_T, y: pt.y }));
-  p.moveTo(inL[0].x, inL[0].y);
-  inL.forEach(pt => p.lineTo(pt.x, pt.y));
-  [...inR].reverse().forEach(pt => p.lineTo(pt.x, pt.y));
-  p.closePath();
-  return p;
-}
+// ======================================================
+// PARTÍCULAS
+// ======================================================
 
-// ============================================================
-//  AREIA
-// ============================================================
-function makeTopSandPath(pct) {
-  if (pct <= 0) return null;
-  const steps = 50;
-  const pts = [];
+let particles = [];
 
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    const y = lerp(NECK_Y, TOP_Y, t);
-    const hw = lerp(NECK_W / 2, TOP_W / 2, t * t) - GLASS_T;
-    pts.push({ x: NECK_X - hw, y });
-  }
+// ======================================================
+// PARTICLE
+// ======================================================
 
-  const fillY = lerp(NECK_Y, TOP_Y, pct);
-  const clipped = pts.filter(p => p.y >= fillY);
-  if (!clipped.length) return null;
-
-  const path = new Path2D();
-  path.moveTo(clipped[0].x, clipped[0].y);
-  clipped.forEach(pt => path.lineTo(pt.x, pt.y));
-  [...clipped].reverse().forEach(pt => path.lineTo(NECK_X + (NECK_X - pt.x), pt.y));
-  path.closePath();
-
-  return path;
-}
-
-function makeBotSandPath(pct) {
-  if (pct <= 0) return null;
-  const steps = 50;
-  const pts = [];
-
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    const y = lerp(NECK_Y, BOT_Y, t);
-    const hw = lerp(NECK_W / 2, BOT_W / 2, t * (2 - t)) - GLASS_T;
-    pts.push({ x: NECK_X - hw, y });
-  }
-
-  const fillY = lerp(NECK_Y, BOT_Y, pct);
-  const clipped = pts.filter(p => p.y <= fillY);
-  if (!clipped.length) return null;
-
-  const path = new Path2D();
-  const rev = [...clipped].reverse();
-  path.moveTo(rev[0].x, rev[0].y);
-  rev.forEach(pt => path.lineTo(pt.x, pt.y));
-  clipped.forEach(pt => path.lineTo(NECK_X + (NECK_X - pt.x), pt.y));
-  path.closePath();
-
-  return path;
-}
-
-// ============================================================
-//  PARTÍCULAS
-// ============================================================
 class Particle {
-  constructor() { this.reset(); }
+
+  constructor() {
+
+    this.reset();
+  }
 
   reset() {
-    this.x = NECK_X + (Math.random() - 0.5) * NECK_W;
-    this.y = NECK_Y;
-    this.vy = 1 + Math.random() * 3;
-    this.vx = (Math.random() - 0.5);
-    this.r = 1.5;
+
+    this.x = centerX + (Math.random() - .5) * 8;
+
+    this.y = centerY;
+
+    this.vx = (Math.random() - .5) * .5;
+
+    this.vy = 2 + Math.random() * 2;
+
+    this.r = 1 + Math.random() * 1.5;
+
+    this.alpha = .6 + Math.random() * .4;
+
     this.alive = true;
   }
 
-  update(botPct) {
-    this.vy += 0.2;
+  update(fill) {
+
     this.y += this.vy;
     this.x += this.vx;
 
-    const t = Math.max(0, (this.y - NECK_Y) / (BOT_Y - NECK_Y));
-    const hw = lerp(NECK_W / 2, BOT_W / 2, t * (2 - t)) - GLASS_T;
+    const floor = 320 - (fill * 140);
 
-    if (this.x > NECK_X + hw) this.x = NECK_X + hw;
-    if (this.x < NECK_X - hw) this.x = NECK_X - hw;
-
-    const floor = lerp(NECK_Y, BOT_Y, botPct);
-    if (this.y >= floor) this.alive = false;
+    if (this.y >= floor) {
+      this.alive = false;
+    }
   }
 
   draw() {
+
     ctx.beginPath();
+
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-    ctx.fillStyle = '#f5c542';
+
+    ctx.fillStyle =
+      `rgba(245,197,66,${this.alpha})`;
+
     ctx.fill();
   }
+
 }
 
-// ============================================================
-//  RENDER
-// ============================================================
-function render() {
-  ctx.clearRect(0, 0, W, H);
+// ======================================================
+// AMPULHETA
+// ======================================================
 
-  const pct = tempoTotal > 0 ? Math.max(0, tempoRestante / tempoTotal) : 1;
-  const botPct = 1 - pct;
+function drawHourglass() {
 
-  const glassPath = makeGlassPath();
-  const innerPath = makeInnerPath();
+  ctx.clearRect(0,0,W,H);
 
-  ctx.fillStyle = 'rgba(200,200,255,0.1)';
-  ctx.fill(glassPath);
+  const progress =
+    tempoTotal > 0
+      ? tempoRestante / tempoTotal
+      : 1;
 
-  ctx.save();
-  ctx.clip(innerPath);
+  const bottomFill = 1 - progress;
 
-  const top = makeTopSandPath(pct);
-  if (top) {
-    ctx.fillStyle = '#e0a800';
-    ctx.fill(top);
+  // vidro
+  const glass = ctx.createLinearGradient(0,0,W,H);
+
+  glass.addColorStop(0,'rgba(255,255,255,.20)');
+  glass.addColorStop(.5,'rgba(255,255,255,.04)');
+  glass.addColorStop(1,'rgba(255,255,255,.15)');
+
+  ctx.fillStyle = glass;
+
+  ctx.beginPath();
+
+  ctx.moveTo(70,40);
+  ctx.lineTo(210,40);
+  ctx.lineTo(150,190);
+  ctx.lineTo(210,380);
+  ctx.lineTo(70,380);
+  ctx.lineTo(130,190);
+
+  ctx.closePath();
+
+  ctx.fill();
+
+  // borda
+  ctx.strokeStyle = 'rgba(255,255,255,.35)';
+  ctx.lineWidth = 3;
+
+  ctx.stroke();
+
+  // areia superior
+  const topHeight = 120 * progress;
+
+  ctx.beginPath();
+
+  ctx.moveTo(88, 175 - topHeight);
+
+  ctx.lineTo(192, 175 - topHeight);
+
+  ctx.lineTo(140,190);
+
+  ctx.closePath();
+
+  ctx.fillStyle = '#e0a800';
+
+  ctx.fill();
+
+  // fluxo
+  if(tempoRestante > 0){
+
+    ctx.beginPath();
+
+    ctx.moveTo(centerX,190);
+
+    ctx.lineTo(centerX,250);
+
+    ctx.strokeStyle = '#f4c542';
+
+    ctx.lineWidth = 2;
+
+    ctx.stroke();
   }
 
-  const bot = makeBotSandPath(botPct);
-  if (bot) {
-    ctx.fillStyle = '#c47a00';
-    ctx.fill(bot);
-  }
+  // areia inferior
+  const bottomHeight = 140 * bottomFill;
 
-  particles.forEach(p => p.draw());
-  ctx.restore();
+  ctx.beginPath();
 
-  ctx.strokeStyle = '#aaa';
-  ctx.stroke(glassPath);
+  ctx.moveTo(90,340);
+
+  ctx.lineTo(190,340);
+
+  ctx.lineTo(140,340 - bottomHeight);
+
+  ctx.closePath();
+
+  ctx.fillStyle = '#c47a00';
+
+  ctx.fill();
+
+  // partículas
+  particles.forEach(p => {
+
+    p.update(bottomFill);
+
+    p.draw();
+  });
+
+  particles =
+    particles.filter(p => p.alive);
+
+  // brilho
+  ctx.beginPath();
+
+  ctx.moveTo(92,60);
+  ctx.lineTo(110,170);
+
+  ctx.strokeStyle =
+    'rgba(255,255,255,.18)';
+
+  ctx.lineWidth = 5;
+
+  ctx.stroke();
 }
 
-// ============================================================
-//  LOOP
-// ============================================================
-function spawnParticles() {
-  if (tempoRestante <= 0) return;
-
-  const now = Date.now();
-  if (now - lastSpawnTime > 60) {
-    particles.push(new Particle());
-    lastSpawnTime = now;
-  }
-
-  const botPct = 1 - (tempoRestante / tempoTotal);
-  particles.forEach(p => p.update(botPct));
-  particles = particles.filter(p => p.alive);
-}
+// ======================================================
+// LOOP
+// ======================================================
 
 function loop() {
-  spawnParticles();
-  render();
+
+  if(currentView === 'hourglass') {
+
+    if(tempoRestante > 0){
+
+      if(Math.random() > .35){
+
+        particles.push(new Particle());
+      }
+    }
+
+    drawHourglass();
+  }
+
   requestAnimationFrame(loop);
 }
 
-// ============================================================
-//  TEMPO
-// ============================================================
-function formatTime(t) {
+loop();
+
+// ======================================================
+// FORMAT
+// ======================================================
+
+function formatTime(t){
+
   const m = Math.floor(t / 60);
+
   const s = t % 60;
-  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
-function getInputSeconds() {
-  let min = parseInt(document.getElementById('minutos').value) || 0;
-  let seg = parseInt(document.getElementById('segundos').value) || 0;
+// ======================================================
+// DISPLAY
+// ======================================================
 
-  if (seg >= 60) {
-    min += Math.floor(seg / 60);
-    seg = seg % 60;
-  }
+function atualizarDisplay(){
 
-  return min * 60 + seg;
+  const txt = formatTime(tempoRestante);
+
+  document.getElementById('display').textContent = txt;
+
+  document.getElementById('circleTime').textContent = txt;
+
+  atualizarCirculo();
 }
 
-function atualizarDisplay() {
-  document.getElementById('display').textContent = formatTime(tempoRestante);
+// ======================================================
+// CIRCULO
+// ======================================================
+
+function atualizarCirculo(){
+
+  const ring =
+    document.querySelector('.ring-progress');
+
+  if(!ring || tempoTotal <= 0) return;
+
+  const radius = 110;
+
+  const circumference =
+    2 * Math.PI * radius;
+
+  const progress =
+    tempoRestante / tempoTotal;
+
+  ring.style.strokeDasharray =
+    circumference;
+
+  ring.style.strokeDashoffset =
+    circumference * (1 - progress);
 }
 
-// ============================================================
-//  CONTROLES
-// ============================================================
-function iniciar() {
+// ======================================================
+// INPUT
+// ======================================================
+
+function getInputSeconds(){
+
+  let min =
+    parseInt(document.getElementById('minutos').value) || 0;
+
+  let seg =
+    parseInt(document.getElementById('segundos').value) || 0;
+
+  return (min * 60) + seg;
+}
+
+// ======================================================
+// START
+// ======================================================
+
+function iniciar(){
+
   clearInterval(intervalo);
 
   const total = getInputSeconds();
-  if (total <= 0) return alert('Tempo inválido');
+
+  if(total <= 0){
+    return alert('Tempo inválido');
+  }
 
   tempoTotal = total;
   tempoRestante = total;
+
   particles = [];
 
-  document.getElementById('penalidade').classList.remove('visivel');
+  document
+    .getElementById('penalidade')
+    .classList.remove('visivel');
 
   atualizarDisplay();
 
-  intervalo = setInterval(tick, 1000);
+  intervalo = setInterval(tick,1000);
 }
 
-function setTempo(segundos) {
-  clearInterval(intervalo);
+// ======================================================
+// TICK
+// ======================================================
 
-  tempoTotal = segundos;
-  tempoRestante = segundos;
-  particles = [];
+function tick(){
 
-  document.getElementById('minutos').value = Math.floor(segundos / 60);
-  document.getElementById('segundos').value = segundos % 60;
-
-  document.getElementById('penalidade').classList.remove('visivel');
-
-  atualizarDisplay();
-
-  intervalo = setInterval(tick, 1000);
-}
-
-function tick() {
   tempoRestante--;
+
   atualizarDisplay();
 
-  if (tempoRestante <= 0) {
-    clearInterval(intervalo);
+  if(tempoRestante <= 0){
+
     tempoRestante = 0;
+
     atualizarDisplay();
 
-    particles = [];
+    clearInterval(intervalo);
 
-    document.getElementById('penalidade').classList.add('visivel');
+    document
+      .getElementById('penalidade')
+      .classList.add('visivel');
 
-    // vibração (mobile)
-    if (navigator.vibrate) {
+    if(navigator.vibrate){
       navigator.vibrate([200,100,200]);
     }
-
-    // som (opcional)
-    // new Audio('som.mp3').play();
   }
 }
 
-function pausar() {
+// ======================================================
+// PAUSAR
+// ======================================================
+
+function pausar(){
+
   clearInterval(intervalo);
 }
 
-function resetar() {
+// ======================================================
+// RESET
+// ======================================================
+
+function resetar(){
+
   clearInterval(intervalo);
+
   tempoRestante = 0;
   tempoTotal = 0;
+
   particles = [];
 
   atualizarDisplay();
-  document.getElementById('penalidade').classList.remove('visivel');
+
+  document
+    .getElementById('penalidade')
+    .classList.remove('visivel');
 }
 
-// ============================================================
-//  START
-// ============================================================
-loop();
+// ======================================================
+// TEMPOS RÁPIDOS
+// ======================================================
+
+function setTempo(seg){
+
+  clearInterval(intervalo);
+
+  tempoTotal = seg;
+  tempoRestante = seg;
+
+  document.getElementById('minutos').value =
+    Math.floor(seg / 60);
+
+  document.getElementById('segundos').value =
+    seg % 60;
+
+  atualizarDisplay();
+
+  intervalo = setInterval(tick,1000);
+}
+
+// ======================================================
+// VIEW
+// ======================================================
+
+function setView(view){
+
+  currentView = view;
+
+  const hg =
+    document.getElementById('hg');
+
+  const circle =
+    document.getElementById('circleWrapper');
+
+  document
+    .querySelectorAll('.mode')
+    .forEach(btn => btn.classList.remove('active'));
+
+  if(view === 'hourglass'){
+
+    hg.classList.remove('hidden');
+
+    circle.classList.add('hidden');
+
+    document.querySelectorAll('.mode')[0]
+      .classList.add('active');
+
+  } else {
+
+    hg.classList.add('hidden');
+
+    circle.classList.remove('hidden');
+
+    document.querySelectorAll('.mode')[1]
+      .classList.add('active');
+  }
+}
