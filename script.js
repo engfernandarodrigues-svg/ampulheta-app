@@ -1,148 +1,251 @@
-// ======================================================
+// ============================================
 // CONFIG
-// ======================================================
+// ============================================
 
-const canvas = document.getElementById('hg');
-const ctx = canvas.getContext('2d');
+const canvas =
+document.getElementById('hourglassCanvas');
 
-const W = 280;
+const ctx =
+canvas.getContext('2d');
+
+const W = 320;
 const H = 420;
 
-// ======================================================
+// ============================================
 // TIMER
-// ======================================================
+// ============================================
+
+let tempoTotal = 90;
+let tempoRestante = 90;
 
 let intervalo = null;
 
-let tempoRestante = 0;
-let tempoTotal = 0;
-
 let currentView = 'hourglass';
 
-// ======================================================
-// GEOMETRIA
-// ======================================================
-
-const centerX = W / 2;
-const centerY = H / 2;
-
-// ======================================================
-// PARTÍCULAS
-// ======================================================
+// ============================================
+// PARTICULAS
+// ============================================
 
 let particles = [];
 
-// ======================================================
+// ============================================
 // PARTICLE
-// ======================================================
+// ============================================
 
-class Particle {
+class Particle{
 
-  constructor() {
+  constructor(){
 
     this.reset();
   }
 
-  reset() {
+  reset(){
 
-    this.x = centerX + (Math.random() - .5) * 8;
+    this.x =
+      W/2 + (Math.random()-.5)*8;
 
-    this.y = centerY;
+    this.y = 185;
 
-    this.vx = (Math.random() - .5) * .5;
+    this.vx =
+      (Math.random()-.5)*.3;
 
-    this.vy = 2 + Math.random() * 2;
+    this.vy =
+      2 + Math.random()*1.5;
 
-    this.r = 1 + Math.random() * 1.5;
+    this.r =
+      .8 + Math.random()*1.2;
 
-    this.alpha = .6 + Math.random() * .4;
+    this.alpha =
+      .5 + Math.random()*0.5;
 
     this.alive = true;
   }
 
-  update(fill) {
+  update(fill){
 
     this.y += this.vy;
     this.x += this.vx;
 
-    const floor = 320 - (fill * 140);
+    const floor =
+      305 - (fill*95);
 
-    if (this.y >= floor) {
+    if(this.y >= floor){
+
       this.alive = false;
     }
   }
 
-  draw() {
+  draw(){
 
     ctx.beginPath();
 
-    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.arc(
+      this.x,
+      this.y,
+      this.r,
+      0,
+      Math.PI*2
+    );
 
     ctx.fillStyle =
-      `rgba(245,197,66,${this.alpha})`;
+      `rgba(255,210,90,${this.alpha})`;
 
     ctx.fill();
   }
-
 }
 
-// ======================================================
+// ============================================
 // AMPULHETA
-// ======================================================
+// ============================================
 
-function drawHourglass() {
+function drawHourglass(){
 
   ctx.clearRect(0,0,W,H);
 
   const progress =
-    tempoTotal > 0
-      ? tempoRestante / tempoTotal
-      : 1;
+    tempoRestante / tempoTotal;
 
-  const bottomFill = 1 - progress;
+  const bottomFill =
+    1 - progress;
+
+  // glow
+  const glow =
+    ctx.createRadialGradient(
+      W/2,
+      210,
+      30,
+      W/2,
+      210,
+      180
+    );
+
+  glow.addColorStop(
+    0,
+    'rgba(170,90,255,.12)'
+  );
+
+  glow.addColorStop(
+    1,
+    'transparent'
+  );
+
+  ctx.fillStyle = glow;
+
+  ctx.fillRect(0,0,W,H);
 
   // vidro
-  const glass = ctx.createLinearGradient(0,0,W,H);
+  const glass =
+    ctx.createLinearGradient(
+      0,
+      0,
+      W,
+      H
+    );
 
-  glass.addColorStop(0,'rgba(255,255,255,.20)');
-  glass.addColorStop(.5,'rgba(255,255,255,.04)');
-  glass.addColorStop(1,'rgba(255,255,255,.15)');
+  glass.addColorStop(
+    0,
+    'rgba(255,255,255,.22)'
+  );
+
+  glass.addColorStop(
+    .5,
+    'rgba(255,255,255,.04)'
+  );
+
+  glass.addColorStop(
+    1,
+    'rgba(255,255,255,.16)'
+  );
 
   ctx.fillStyle = glass;
 
   ctx.beginPath();
 
-  ctx.moveTo(70,40);
-  ctx.lineTo(210,40);
-  ctx.lineTo(150,190);
-  ctx.lineTo(210,380);
-  ctx.lineTo(70,380);
-  ctx.lineTo(130,190);
+  ctx.moveTo(90,40);
 
-  ctx.closePath();
+  ctx.bezierCurveTo(
+    90,
+    120,
+    120,
+    150,
+    145,
+    190
+  );
 
-  ctx.fill();
+  ctx.bezierCurveTo(
+    165,
+    210,
+    165,
+    210,
+    175,
+    190
+  );
 
-  // borda
-  ctx.strokeStyle = 'rgba(255,255,255,.35)';
-  ctx.lineWidth = 3;
+  ctx.bezierCurveTo(
+    200,
+    150,
+    230,
+    120,
+    230,
+    40
+  );
+
+  ctx.lineTo(230,40);
+
+  ctx.lineTo(230,40);
+
+  ctx.bezierCurveTo(
+    230,
+    120,
+    200,
+    270,
+    175,
+    230
+  );
+
+  ctx.bezierCurveTo(
+    165,
+    210,
+    165,
+    210,
+    145,
+    230
+  );
+
+  ctx.bezierCurveTo(
+    120,
+    270,
+    90,
+    300,
+    90,
+    380
+  );
+
+  ctx.lineTo(230,380);
+
+  ctx.strokeStyle =
+    'rgba(255,255,255,.35)';
+
+  ctx.lineWidth = 4;
 
   ctx.stroke();
 
   // areia superior
-  const topHeight = 120 * progress;
+  const topHeight =
+    95 * progress;
 
   ctx.beginPath();
 
-  ctx.moveTo(88, 175 - topHeight);
+  ctx.moveTo(112,160-topHeight);
 
-  ctx.lineTo(192, 175 - topHeight);
+  ctx.lineTo(208,160-topHeight);
 
-  ctx.lineTo(140,190);
+  ctx.lineTo(160,188);
 
   ctx.closePath();
 
-  ctx.fillStyle = '#e0a800';
+  ctx.fillStyle =
+    '#d69d18';
 
   ctx.fill();
 
@@ -151,11 +254,12 @@ function drawHourglass() {
 
     ctx.beginPath();
 
-    ctx.moveTo(centerX,190);
+    ctx.moveTo(160,190);
 
-    ctx.lineTo(centerX,250);
+    ctx.lineTo(160,270);
 
-    ctx.strokeStyle = '#f4c542';
+    ctx.strokeStyle =
+      '#f4c542';
 
     ctx.lineWidth = 2;
 
@@ -163,24 +267,26 @@ function drawHourglass() {
   }
 
   // areia inferior
-  const bottomHeight = 140 * bottomFill;
+  const bottomHeight =
+    95 * bottomFill;
 
   ctx.beginPath();
 
-  ctx.moveTo(90,340);
+  ctx.moveTo(110,315);
 
-  ctx.lineTo(190,340);
+  ctx.lineTo(210,315);
 
-  ctx.lineTo(140,340 - bottomHeight);
+  ctx.lineTo(160,315-bottomHeight);
 
   ctx.closePath();
 
-  ctx.fillStyle = '#c47a00';
+  ctx.fillStyle =
+    '#c47a00';
 
   ctx.fill();
 
   // partículas
-  particles.forEach(p => {
+  particles.forEach(p=>{
 
     p.update(bottomFill);
 
@@ -188,13 +294,14 @@ function drawHourglass() {
   });
 
   particles =
-    particles.filter(p => p.alive);
+    particles.filter(p=>p.alive);
 
   // brilho
   ctx.beginPath();
 
-  ctx.moveTo(92,60);
-  ctx.lineTo(110,170);
+  ctx.moveTo(118,65);
+
+  ctx.lineTo(135,175);
 
   ctx.strokeStyle =
     'rgba(255,255,255,.18)';
@@ -204,70 +311,81 @@ function drawHourglass() {
   ctx.stroke();
 }
 
-// ======================================================
+// ============================================
 // LOOP
-// ======================================================
+// ============================================
 
-function loop() {
+function animate(){
 
-  if(currentView === 'hourglass') {
+  if(currentView === 'hourglass'){
 
-    if(tempoRestante > 0){
+    if(
+      tempoRestante > 0 &&
+      Math.random() > .25
+    ){
 
-      if(Math.random() > .35){
-
-        particles.push(new Particle());
-      }
+      particles.push(
+        new Particle()
+      );
     }
 
     drawHourglass();
   }
 
-  requestAnimationFrame(loop);
+  requestAnimationFrame(animate);
 }
 
-loop();
+animate();
 
-// ======================================================
+// ============================================
 // FORMAT
-// ======================================================
+// ============================================
 
 function formatTime(t){
 
-  const m = Math.floor(t / 60);
+  const m =
+    Math.floor(t/60);
 
-  const s = t % 60;
+  const s =
+    t%60;
 
   return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
-// ======================================================
+// ============================================
 // DISPLAY
-// ======================================================
+// ============================================
 
-function atualizarDisplay(){
+function updateDisplay(){
 
-  const txt = formatTime(tempoRestante);
+  const txt =
+    formatTime(tempoRestante);
 
-  document.getElementById('display').textContent = txt;
+  document.getElementById(
+    'display'
+  ).textContent = txt;
 
-  document.getElementById('circleTime').textContent = txt;
+  document.getElementById(
+    'circleTime'
+  ).textContent = txt;
 
-  atualizarCirculo();
+  updateCircle();
 }
 
-// ======================================================
-// CIRCULO
-// ======================================================
+updateDisplay();
 
-function atualizarCirculo(){
+// ============================================
+// CIRCLE
+// ============================================
+
+function updateCircle(){
 
   const ring =
-    document.querySelector('.ring-progress');
+    document.querySelector(
+      '.ring-progress'
+    );
 
-  if(!ring || tempoTotal <= 0) return;
-
-  const radius = 110;
+  const radius = 120;
 
   const circumference =
     2 * Math.PI * radius;
@@ -279,165 +397,120 @@ function atualizarCirculo(){
     circumference;
 
   ring.style.strokeDashoffset =
-    circumference * (1 - progress);
+    circumference * (1-progress);
 }
 
-// ======================================================
-// INPUT
-// ======================================================
-
-function getInputSeconds(){
-
-  let min =
-    parseInt(document.getElementById('minutos').value) || 0;
-
-  let seg =
-    parseInt(document.getElementById('segundos').value) || 0;
-
-  return (min * 60) + seg;
-}
-
-// ======================================================
-// START
-// ======================================================
-
-function iniciar(){
-
-  clearInterval(intervalo);
-
-  const total = getInputSeconds();
-
-  if(total <= 0){
-    return alert('Tempo inválido');
-  }
-
-  tempoTotal = total;
-  tempoRestante = total;
-
-  particles = [];
-
-  document
-    .getElementById('penalidade')
-    .classList.remove('visivel');
-
-  atualizarDisplay();
-
-  intervalo = setInterval(tick,1000);
-}
-
-// ======================================================
+// ============================================
 // TICK
-// ======================================================
+// ============================================
 
 function tick(){
 
   tempoRestante--;
 
-  atualizarDisplay();
+  updateDisplay();
 
   if(tempoRestante <= 0){
 
     tempoRestante = 0;
 
-    atualizarDisplay();
-
     clearInterval(intervalo);
 
-    document
-      .getElementById('penalidade')
-      .classList.add('visivel');
+    updateDisplay();
 
     if(navigator.vibrate){
-      navigator.vibrate([200,100,200]);
+
+      navigator.vibrate(
+        [200,100,200]
+      );
     }
   }
 }
 
-// ======================================================
-// PAUSAR
-// ======================================================
+// ============================================
+// START
+// ============================================
+
+function iniciar(){
+
+  clearInterval(intervalo);
+
+  intervalo =
+    setInterval(tick,1000);
+}
+
+// ============================================
+// PAUSE
+// ============================================
 
 function pausar(){
 
   clearInterval(intervalo);
 }
 
-// ======================================================
+// ============================================
 // RESET
-// ======================================================
+// ============================================
 
 function resetar(){
 
   clearInterval(intervalo);
 
-  tempoRestante = 0;
-  tempoTotal = 0;
+  tempoRestante = tempoTotal;
 
-  particles = [];
-
-  atualizarDisplay();
-
-  document
-    .getElementById('penalidade')
-    .classList.remove('visivel');
+  updateDisplay();
 }
 
-// ======================================================
-// TEMPOS RÁPIDOS
-// ======================================================
-
-function setTempo(seg){
-
-  clearInterval(intervalo);
-
-  tempoTotal = seg;
-  tempoRestante = seg;
-
-  document.getElementById('minutos').value =
-    Math.floor(seg / 60);
-
-  document.getElementById('segundos').value =
-    seg % 60;
-
-  atualizarDisplay();
-
-  intervalo = setInterval(tick,1000);
-}
-
-// ======================================================
+// ============================================
 // VIEW
-// ======================================================
+// ============================================
 
 function setView(view){
 
   currentView = view;
 
-  const hg =
-    document.getElementById('hg');
+  const hourglass =
+    document.getElementById(
+      'hourglassView'
+    );
 
   const circle =
-    document.getElementById('circleWrapper');
+    document.getElementById(
+      'circleView'
+    );
 
   document
     .querySelectorAll('.mode')
-    .forEach(btn => btn.classList.remove('active'));
+    .forEach(btn=>
+      btn.classList.remove('active')
+    );
 
   if(view === 'hourglass'){
 
-    hg.classList.remove('hidden');
+    hourglass.classList.remove(
+      'hidden'
+    );
 
-    circle.classList.add('hidden');
+    circle.classList.add(
+      'hidden'
+    );
 
-    document.querySelectorAll('.mode')[0]
+    document
+      .querySelectorAll('.mode')[0]
       .classList.add('active');
 
   } else {
 
-    hg.classList.add('hidden');
+    hourglass.classList.add(
+      'hidden'
+    );
 
-    circle.classList.remove('hidden');
+    circle.classList.remove(
+      'hidden'
+    );
 
-    document.querySelectorAll('.mode')[1]
+    document
+      .querySelectorAll('.mode')[1]
       .classList.add('active');
   }
 }
