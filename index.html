@@ -2,15 +2,15 @@
 <html lang="pt-BR">
 <head>
 
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Ampulheta Pro</title>
+  <title>Ampulheta Premium</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
 
@@ -18,42 +18,44 @@
 
 <body>
 
-<div class="bg"></div>
+<div class="background-glow"></div>
 
-<div class="app">
+<div class="container">
 
   <!-- LOGO -->
-  <div class="logo-wrap">
-    <img src="./logo.png" class="logo">
+  <div class="logo-area">
+
+    <img src="logo.png" class="logo">
+
   </div>
 
-  <!-- MODOS -->
-  <div class="mode-switch">
+  <!-- SWITCH -->
+  <div class="switch">
 
-    <button class="mode active" onclick="setView('hourglass')">
+    <button class="switch-btn active" onclick="setView('hourglass')">
       Ampulheta
     </button>
 
-    <button class="mode" onclick="setView('circle')">
+    <button class="switch-btn" onclick="setView('circle')">
       Circular
     </button>
 
   </div>
 
-  <!-- CARD VISUAL -->
-  <div class="visual-card">
+  <!-- CARD -->
+  <div class="glass-card">
 
     <!-- AMPULHETA -->
-    <div class="hourglass-view" id="hourglassView">
+    <div id="hourglassView" class="view">
 
-      <canvas id="hourglassCanvas" width="320" height="420"></canvas>
+      <canvas id="canvas" width="320" height="470"></canvas>
 
     </div>
 
     <!-- CIRCULAR -->
-    <div class="circle-view hidden" id="circleView">
+    <div id="circleView" class="view hidden">
 
-      <svg class="ring" width="300" height="300">
+      <svg class="progress-ring" width="300" height="300">
 
         <circle
           class="ring-bg"
@@ -71,30 +73,28 @@
 
       </svg>
 
-      <div class="circle-center">
-
-        <div class="circle-time" id="circleTime">
-          01:30
-        </div>
-
+      <div class="circle-time" id="circleTime">
+        01:30
       </div>
 
     </div>
 
-    <!-- TEMPO -->
-    <div class="main-time" id="display">
+    <!-- TIMER -->
+    <div class="timer" id="display">
       01:30
     </div>
 
-    <div class="time-labels">
+    <div class="labels">
+
       <span>MINUTOS</span>
       <span>SEGUNDOS</span>
+
     </div>
 
   </div>
 
-  <!-- TEMPO FIXO -->
-  <div class="time-pill">
+  <!-- PILL -->
+  <div class="pill">
     ⏱ 1:30
   </div>
 
@@ -116,15 +116,18 @@
   </div>
 
   <!-- FOOTER -->
-  <div class="footer-card">
+  <div class="footer">
 
     <div class="footer-icon">
       ✦
     </div>
 
-    <div>
+    <div class="footer-text">
+
       <h3>Foco, disciplina e automação</h3>
+
       <p>Transforme processos em resultados.</p>
+
     </div>
 
   </div>
